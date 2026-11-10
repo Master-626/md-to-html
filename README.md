@@ -73,3 +73,30 @@ pytest
 ## 📄 License
 
 MIT License
+
+## Output safety
+
+Output files must be new. The API raises `FileExistsError` for any existing
+output entry, including a directory, symlink (even dangling), or hard link.
+The CLI reports the error and exits nonzero. This also prevents accidentally
+replacing the Markdown source. Choose a different output name, or move an
+existing output aside yourself before converting again. Omitting the output
+path still returns HTML through the API and prints HTML through the CLI.
+
+Each output is fully written to a temporary file beside its destination, then
+published with an atomic, no-replacement hard link. Temporary files are cleaned
+up on ordinary failures. Creation permissions honor the process umask. The
+filesystem must support hard links; unsupported filesystems fail safely rather
+than falling back to an overwrite-prone operation. A process crash can leave a
+temporary file. This is not a durability guarantee (files are not fsynced), or
+a sandbox against an adversary replacing parent directories during conversion.
+
+Batch conversion checks all known output collisions before writing, then
+converts top-level `*.md` files in sorted order. Invalid input directories raise
+`NotADirectoryError`. Batches are not transactions: a later conversion failure
+or concurrent collision leaves earlier new outputs intact, but never overwrites
+the conflicting entry. Empty input directories produce zero files.
+
+CI covers Python 3.8–3.14 on Linux, plus Python 3.13 on Windows and macOS,
+minimum runtime dependencies, distribution builds and both CLI entry points.
+These are configured jobs, not a claim that unpublished changes passed hosted CI.
