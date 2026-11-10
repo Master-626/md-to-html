@@ -3,7 +3,6 @@ CLI interface for md-to-html.
 """
 
 import click
-from pathlib import Path
 
 from .converter import MarkdownConverter
 
@@ -27,7 +26,10 @@ def convert(input, output, toc, no_highlight):
         enable_code_highlight=not no_highlight,
     )
 
-    html = converter.convert_file(input, output)
+    try:
+        html = converter.convert_file(input, output)
+    except (OSError, UnicodeError) as exc:
+        raise click.ClickException(str(exc)) from exc
 
     if output:
         click.echo(f"✅ Converted: {input} -> {output}")
@@ -42,7 +44,10 @@ def convert(input, output, toc, no_highlight):
 def batch(input_dir, output_dir, toc):
     """Batch convert all Markdown files in a directory."""
     converter = MarkdownConverter(enable_toc=toc)
-    count = converter.convert_directory(input_dir, output_dir)
+    try:
+        count = converter.convert_directory(input_dir, output_dir)
+    except (OSError, UnicodeError) as exc:
+        raise click.ClickException(str(exc)) from exc
     click.echo(f"✅ Converted {count} files -> {output_dir}")
 
 

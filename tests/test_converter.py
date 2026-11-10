@@ -22,7 +22,7 @@ def test_convert_text_toc():
 def test_convert_file(tmp_path):
     """Test file conversion."""
     input_file = tmp_path / "test.md"
-    input_file.write_text("# Test\nHello World")
+    input_file.write_text("# Test\nHello World", encoding="utf-8")
 
     converter = MarkdownConverter()
     converter.convert_file(str(input_file), str(tmp_path / "test.html"))
