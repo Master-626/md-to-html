@@ -1,4 +1,4 @@
-name: Tests and packaging
+name: Lint, tests, and packaging
 on: [push, pull_request]
 permissions:
   contents: read
@@ -23,6 +23,7 @@ jobs:
           check-latest: true
       - run: python -m pip install --upgrade pip
       - run: python -m pip install ".[dev]"
+      - run: python -m ruff check .
       - run: python -m pytest -q
       - run: md-to-html --help
       - run: md2html --help
@@ -34,7 +35,7 @@ jobs:
         with:
           python-version: '3.8'
           check-latest: true
-      - run: python -m pip install "click==8.0.0" "markdown==3.5" "pytest==7.0.0" .
+      - run: python -m pip install "click==8.0.0" "markdown==3.5" "pygments==2.14.0" "pytest==7.0.0" .
       - run: python -m pytest -q
   package:
     runs-on: ubuntu-22.04
